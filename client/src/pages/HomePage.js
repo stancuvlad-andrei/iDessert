@@ -4,13 +4,15 @@ import { Link } from 'react-router-dom';
 function HomePage() {
   const [bakeries, setBakeries] = useState([]);
   const [search, setSearch] = useState('');
-  
+
   useEffect(() => {
-    fetch(`/api?search=${search}`)
+    // Fetch bakeries with search query
+    fetch(`/api/bakeries?search=${search}`)
       .then((res) => res.json())
       .then((data) => {
         setBakeries(data.bakeries || []);
-      });
+      })
+      .catch((error) => console.error('Error fetching bakeries:', error));
   }, [search]);
 
   return (

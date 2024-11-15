@@ -7,11 +7,14 @@ function BakeryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api')
+    fetch(`/api/bakeries/${id}`)
       .then((res) => res.json())
       .then((data) => {
-        const bakeryData = data.bakeries.find((b) => b.id === parseInt(id));
-        setBakery(bakeryData);
+        setBakery(data.bakery);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching bakery details:', error);
         setLoading(false);
       });
   }, [id]);
@@ -40,8 +43,21 @@ function BakeryPage() {
       <h1 className="text-4xl font-extrabold text-gray-800 mb-4">{bakery.name}</h1>
       <p className="text-lg text-gray-600">{bakery.description}</p>
 
+      <h2 className="text-2xl font-semibold text-gray-800 mt-6 mb-4">Products</h2>
+      {bakery.products && bakery.products.length > 0 ? (
+        <ul className="list-disc list-inside space-y-2">
+          {bakery.products.map((product, index) => (
+            <li key={index} className="text-gray-700">
+              {product.name} - ${product.price}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-gray-500">No products available yet.</p>
+      )}
+
       <h2 className="text-2xl font-semibold text-gray-800 mt-6 mb-4">Reviews</h2>
-      {bakery.reviews.length > 0 ? (
+      {bakery.reviews && bakery.reviews.length > 0 ? (
         <ul className="list-disc list-inside space-y-2">
           {bakery.reviews.map((review, index) => (
             <li key={index} className="text-gray-700">
