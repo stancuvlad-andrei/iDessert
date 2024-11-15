@@ -1,28 +1,18 @@
-import React, {useEffect, useState} from 'react'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import HomePage from './pages/HomePage';
+import BakeryPage from './pages/BakeryPage';
 
 function App() {
-  const [backendData, setBackendData] = useState([{}])
-  useEffect(() => {
-    fetch("/api").then(
-      response => response.json()
-    ).then(
-      data => {
-        setBackendData(data)
-      }
-    )
-  }, [])
-
-  return(
-    <div>
-      {(typeof backendData.users === 'undefined') ? (
-        <p>Loading...</p>
-      ):(
-        backendData.users.map((user, i) => (
-          <p key={i}>{user}</p>
-        ))
-      )}
-    </div>
-  )
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/bakery/:id" element={<BakeryPage />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
