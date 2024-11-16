@@ -5,9 +5,11 @@ import HomePage from './pages/HomePage';
 import BakeryPage from './pages/BakeryPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import Dashboard from './pages/Dashboard';  // Dashboard
-import ManageBakery from './pages/ManageBakery';  // Manage Bakery
-import AddBakery from './pages/AddBakery';  // Add Bakery Page
+import Dashboard from './pages/Dashboard';
+import ManageBakery from './pages/ManageBakery';
+import AddBakery from './pages/AddBakery';
+import AddProduct from './pages/AddProduct';
+import UpdateProduct from './pages/UpdateProduct';
 
 function App() {
   return (
@@ -15,11 +17,13 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/bakery/:id" element={<BakeryPage />} />
-        <Route path="/login" element={<LoginPage />} />  {/* Login route */}
-        <Route path="/register" element={<RegisterPage />} />  {/* Register route */}
-        <Route path="/dashboard" element={<Dashboard />} />  {/* Dashboard route */}
-        <Route path="/bakery/manage/:id" element={<ManageBakery />} />  {/* Manage Bakery route */}
-        <Route path="/add-bakery" element={<AddBakery />} />  {/* Add Bakery route */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/bakery/manage/:id" element={<ManageBakery />} />  
+        <Route path="/add-bakery" element={<AddBakery />} />
+        <Route path="/bakery/:id/add-product" element={<AddProduct />} />
+        <Route path="/bakery/:bakeryId/product/:productId/update" element={<UpdateProduct />} />
       </Routes>
     </Router>
   );
