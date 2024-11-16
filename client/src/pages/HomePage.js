@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function HomePage() {
   const [bakeries, setBakeries] = useState([]);
   const [search, setSearch] = useState('');
+  const navigate = useNavigate(); // To navigate to the login page after logging out
 
   useEffect(() => {
     // Fetch bakeries with search query
@@ -14,6 +15,12 @@ function HomePage() {
       })
       .catch((error) => console.error('Error fetching bakeries:', error));
   }, [search]);
+
+  const logout = () => {
+    // Clear the user's token (assuming you're storing it in localStorage)
+    localStorage.removeItem('authToken');
+    navigate('/login'); // Redirect to the login page after logging out
+  };
 
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6">
@@ -27,6 +34,14 @@ function HomePage() {
         onChange={(e) => setSearch(e.target.value)}
         className="w-full p-3 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
+
+      {/* Log out Button */}
+      <button
+        onClick={logout}
+        className="mb-6 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+      >
+        Log Out
+      </button>
 
       <div>
         {bakeries.length === 0 ? (
