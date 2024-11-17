@@ -23,41 +23,50 @@ function HomePage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-6">
-      <h1 className="text-4xl font-extrabold text-gray-800 mb-6">Welcome to iDessert</h1>
-      
-      {/* Search Bar */}
-      <input
-        type="text"
-        placeholder="Search for bakeries..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full p-3 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+    <div className="min-h-screen bg-gradient-to-r from-yellow-50 to-orange-100 flex justify-center items-center">
+  <div className="w-full max-w-7xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-md flex flex-col pb-10">
+    <h1 className="text-4xl font-extrabold text-orange-600 mb-6">Welcome to iDessert</h1>
 
-      {/* Log out Button */}
-      <button
-        onClick={logout}
-        className="mb-6 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-      >
-        Log Out
-      </button>
+    {/* Search Bar */}
+    <input
+      type="text"
+      placeholder="Search for bakeries..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="w-full p-3 mb-6 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+    />
 
-      <div>
-        {bakeries.length === 0 ? (
-          <p className="text-gray-600">No bakeries found.</p>
-        ) : (
-          bakeries.map((bakery) => (
-            <div key={bakery.id} className="mb-6">
-              <Link to={`/bakery/${bakery.id}`} className="text-xl font-semibold text-blue-600 hover:text-blue-800">
-                <h3>{bakery.name}</h3>
-              </Link>
-              <p className="text-gray-600">{bakery.description}</p>
-            </div>
-          ))
-        )}
-      </div>
+    <div className="flex-grow">
+      {bakeries.length === 0 ? (
+        <p className="text-orange-700">No bakeries found.</p>
+      ) : (
+        bakeries.map((bakery) => (
+          <div
+            key={bakery.id}
+            className="mb-6 p-4 bg-white rounded-lg shadow hover:shadow-lg hover:border-2 hover:border-orange-400 transition-all"
+          >
+            <Link
+              to={`/bakery/${bakery.id}`}
+              className="text-2xl font-semibold text-orange-600 hover:text-orange-700"
+            >
+              <h3>{bakery.name}</h3>
+            </Link>
+            <p className="text-gray-600 mt-2">{bakery.description}</p>
+          </div>
+        ))
+      )}
     </div>
+
+    {/* Log out Button moved to bottom */}
+    <button
+      onClick={logout}
+      className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 mx-auto"
+    >
+      Log Out
+    </button>
+  </div>
+</div>
+
   );
 }
 

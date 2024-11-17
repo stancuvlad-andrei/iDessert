@@ -39,43 +39,46 @@ function BakeryPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-4xl font-extrabold text-gray-800 mb-4">{bakery.name}</h1>
-      <p className="text-lg text-gray-600">{bakery.description}</p>
+    <div className="min-h-screen bg-gradient-to-r from-yellow-50 to-orange-100 flex justify-center items-center">
+  <div className="max-w-5xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-xl">
+    <h1 className="text-5xl font-extrabold text-orange-600 mb-6">{bakery.name}</h1>
+    <p className="text-xl text-gray-600 mb-6">{bakery.description}</p>
 
-      <h2 className="text-2xl font-semibold text-gray-800 mt-6 mb-4">Products</h2>
-      {bakery.products && bakery.products.length > 0 ? (
-        <ul className="list-disc list-inside space-y-2">
-          {bakery.products.map((product, index) => (
-            <li key={index} className="text-gray-700">
-              {product.name} - ${product.price}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-gray-500">No products available yet.</p>
-      )}
+    <h2 className="text-3xl font-semibold text-orange-600 mt-6 mb-4">Products</h2>
+    {bakery.products && bakery.products.length > 0 ? (
+      <ul className="list-disc list-inside space-y-4">
+        {bakery.products.map((product, index) => (
+          <li key={index} className="text-xl text-gray-700">
+            {product.name} - <span className="font-semibold text-orange-600">${product.price}</span>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p className="text-xl text-gray-500">No products available yet.</p>
+    )}
 
-      <h2 className="text-2xl font-semibold text-gray-800 mt-6 mb-4">Reviews</h2>
-      {bakery.reviews && bakery.reviews.length > 0 ? (
-        <ul className="list-disc list-inside space-y-2">
-          {bakery.reviews.map((review, index) => (
-            <li key={index} className="text-gray-700">
-              {review}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-gray-500">No reviews yet.</p>
-      )}
+    <h2 className="text-3xl font-semibold text-orange-600 mt-6 mb-4">Reviews</h2>
+    {bakery.reviews && bakery.reviews.length > 0 ? (
+      <ul className="list-disc list-inside space-y-4">
+        {bakery.reviews.map((review, index) => (
+          <li key={index} className="text-xl text-gray-700">{review}</li>
+        ))}
+      </ul>
+    ) : (
+      <p className="text-xl text-gray-500">No reviews yet.</p>
+    )}
 
+    <div className="flex justify-center mt-8">
       <Link
         to="/"
-        className="inline-block mt-8 px-6 py-3 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition"
+        className="px-8 py-4 bg-yellow-500 text-white font-medium rounded-lg hover:bg-yellow-600 transition"
       >
         Back to Home
       </Link>
     </div>
+  </div>
+</div>
+
   );
 }
 

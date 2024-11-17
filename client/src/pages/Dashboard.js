@@ -65,41 +65,37 @@ function Dashboard() {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold text-center mb-6">Your Bakeries</h1>
-      
+    <div className="min-h-screen bg-gradient-to-r from-yellow-50 to-orange-100 p-6">
+  <div className="max-w-5xl mx-auto bg-white p-8 shadow-lg rounded-xl flex flex-col justify-between">
+    <div>
+      <h1 className="text-4xl font-extrabold text-orange-600 text-center mb-6">Your Bakeries</h1>
+
       {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-      
-      <div className="flex justify-between mb-6">
+
+      <div className="flex justify-center mb-8">
         <button
           onClick={handleAddBakery}
-          className="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition"
+          className="px-8 py-3 bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 transition"
         >
           Add New Bakery
-        </button>
-        <button
-          onClick={handleLogout}
-          className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition"
-        >
-          Logout
         </button>
       </div>
 
       {bakeries.length > 0 ? (
-        bakeries.map(bakery => (
-          <div key={bakery.id} className="bg-white shadow-lg rounded-lg p-4 mb-6">
-            <h3 className="text-xl font-medium text-gray-800">{bakery.name}</h3>
-            <p className="text-gray-600">{bakery.address}</p>
-            <div className="flex justify-between mt-4">
+        bakeries.map((bakery) => (
+          <div key={bakery.id} className="bg-white shadow-lg rounded-xl p-6 mb-8 hover:border-2 hover:border-yellow-500 transition">
+            <h3 className="text-2xl font-semibold text-gray-800">{bakery.name}</h3>
+            <p className="text-lg text-gray-600">{bakery.address}</p>
+            <div className="flex justify-between mt-6">
               <button
                 onClick={() => navigate(`/bakery/manage/${bakery.id}`)}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
               >
                 Manage Bakery
               </button>
               <button
                 onClick={() => handleRemoveBakery(bakery.id)}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
               >
                 Remove Bakery
               </button>
@@ -107,9 +103,21 @@ function Dashboard() {
           </div>
         ))
       ) : (
-        <p className="text-center text-gray-600">You don't have any bakeries yet.</p>
+        <p className="text-center text-gray-600 text-xl">You don't have any bakeries yet.</p>
       )}
     </div>
+
+    <div className="flex justify-center mt-auto mb-4">
+      <button
+        onClick={handleLogout}
+        className="px-8 py-3 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition"
+      >
+        Logout
+      </button>
+    </div>
+  </div>
+</div>
+
   );
 }
 

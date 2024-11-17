@@ -71,29 +71,35 @@ function ManageBakery() {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold text-center mb-6">Manage Bakery: {bakery ? bakery.name : 'Loading...'}</h1>
+    <div className="min-h-screen bg-gradient-to-r from-yellow-50 to-orange-100 p-6">
+  <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
+    <h1 className="text-4xl font-extrabold text-orange-600 text-center mb-8">
+      Manage Bakery: {bakery ? bakery.name : 'Loading...'}
+    </h1>
 
-      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+    {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
-      <div className="mb-8">
-        <div className="flex justify-between mb-4">
-          <h2 className="text-2xl font-semibold">Products</h2>
-          <button
-            onClick={handleAddProduct}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+    <div className="mb-8">
+      <div className="flex justify-center mb-4">
+        <button
+          onClick={handleAddProduct}
+          className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 border-2 border-transparent hover:border-yellow-600 transition"
+        >
+          Add Product
+        </button>
+      </div>
+
+      {products.length > 0 ? (
+        products.map((product) => (
+          <div
+            key={product.id}
+            className="bg-white shadow-lg rounded-lg p-6 mb-6 hover:border-2 hover:border-yellow-500 transition"
           >
-            Add Product
-          </button>
-        </div>
-        {products.length > 0 ? (
-          products.map(product => (
-            <div key={product.id} className="bg-white shadow-lg rounded-lg p-6 mb-6">
-              <h3 className="text-xl font-medium text-gray-800">{product.name}</h3>
-              <p className="text-gray-600">{product.description}</p>
-              <p className="text-lg text-gray-800">Price: ${product.price}</p>
-              <p className="text-lg text-gray-800">Quantity: {product.quantity}</p>
-              <div className="flex gap-4 mt-4">
+            <h3 className="text-xl font-medium text-gray-800">{product.name}</h3>
+            <p className="text-gray-600">{product.description}</p>
+            <p className="text-lg text-gray-800">Price: ${product.price}</p>
+            <p className="text-lg text-gray-800">Quantity: {product.quantity}</p>
+            <div className="flex gap-4 mt-4">
               <button
                 onClick={() => handleUpdateProduct(product.id)}
                 className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
@@ -101,30 +107,32 @@ function ManageBakery() {
                 Update Product
               </button>
 
-                <button
-                  onClick={() => handleDeleteProduct(product.id)}
-                  className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                >
-                  Delete Product
-                </button>
-              </div>
+              <button
+                onClick={() => handleDeleteProduct(product.id)}
+                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+              >
+                Delete Product
+              </button>
             </div>
-          ))
-        ) : (
-          <p className="text-center text-gray-600">No products found for this bakery.</p>
-        )}
-      </div>
-
-      {/* Go back to dashboard button */}
-      <div className="text-center mt-6">
-        <button
-          onClick={handleGoBack}
-          className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-        >
-          Go Back to Dashboard
-        </button>
-      </div>
+          </div>
+        ))
+      ) : (
+        <p className="text-center text-gray-600">No products found for this bakery.</p>
+      )}
     </div>
+
+    {/* Go back to dashboard button */}
+    <div className="text-center mt-6">
+      <button
+        onClick={handleGoBack}
+        className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+      >
+        Go Back to Dashboard
+      </button>
+    </div>
+  </div>
+</div>
+
   );
 }
 

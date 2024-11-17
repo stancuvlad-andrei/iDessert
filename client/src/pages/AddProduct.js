@@ -41,64 +41,75 @@ function AddProduct() {
   
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold text-center mb-6">Add New Product</h1>
+    <div className="min-h-screen bg-gradient-to-r from-yellow-50 to-orange-100 p-8">
+      <div className="max-w-lg mx-auto bg-white p-10 shadow-lg rounded-lg">
+        <h1 className="text-4xl font-extrabold text-orange-600 text-center mb-8">Add New Product</h1>
 
-      <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-lg p-6 max-w-lg mx-auto">
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-gray-700">Product Name</label>
-          <input
-            id="name"
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="mb-6">
+            <label htmlFor="name" className="block text-gray-700 text-lg font-semibold mb-3">Product Name</label>
+            <input
+              id="name"
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-5 py-3 border rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              required
+            />
+          </div>
 
-        <div className="mb-4">
-          <label htmlFor="description" className="block text-gray-700">Description</label>
-          <textarea
-            id="description"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
+          <div className="mb-6">
+            <label htmlFor="description" className="block text-gray-700 text-lg font-semibold mb-3">Description</label>
+            <textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full px-5 py-3 border rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              required
+            />
+          </div>
 
-        <div className="mb-4">
-          <label htmlFor="price" className="block text-gray-700">Price</label>
-          <input
-            id="price"
-            type="number"
-            value={formData.price}
-            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
+          <div className="mb-6">
+            <label htmlFor="price" className="block text-gray-700 text-lg font-semibold mb-3">Price</label>
+            <input
+              id="price"
+              type="number"
+              value={formData.price}
+              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              className="w-full px-5 py-3 border rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              required
+            />
+          </div>
 
-        <div className="mb-4">
-          <label htmlFor="quantity" className="block text-gray-700">Quantity</label>
-          <input
-            id="quantity"
-            type="number"
-            value={formData.quantity}
-            onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
+          <div className="mb-6">
+            <label htmlFor="quantity" className="block text-gray-700 text-lg font-semibold mb-3">Quantity</label>
+            <input
+              id="quantity"
+              type="number"
+              value={formData.quantity}
+              onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+              className="w-full px-5 py-3 border rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              required
+            />
+          </div>
 
-        <button
-          type="submit"
-          className="w-full px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-        >
-          Add Product
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="w-full px-6 py-3 bg-yellow-500 text-white text-lg font-semibold rounded-lg hover:bg-yellow-600 transition"
+          >
+            Add Product
+          </button>
+
+          {/* Updated Cancel Button */}
+          <button
+            type="button"
+            onClick={() => navigate(`/bakery/manage/${id}`)}  // Navigate to the manage bakery page
+            className="w-full py-3 bg-gray-500 text-white text-lg font-semibold rounded-lg hover:bg-gray-600 transition mt-6"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

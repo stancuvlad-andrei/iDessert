@@ -156,9 +156,6 @@ router.put('/bakeries/:bakeryId/products/:productId', authenticateToken, (req, r
 
   updateValues.push(productId, bakeryId);
 
-  console.log('Update Query:', updateQuery); // Log the update query
-  console.log('Update Values:', updateValues); // Log the update values
-
   connection.query(updateQuery, updateValues, (error, results) => {
     if (error) {
       console.error('Error updating product:', error); // Log the error

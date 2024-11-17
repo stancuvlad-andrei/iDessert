@@ -59,8 +59,6 @@ function UpdateProduct() {
       return;
     }
   
-    console.log('Updated Data:', updatedData); // Log the updated data
-  
     // Send updated product data to the server
     fetch(`/api/bakeries/${bakeryId}/products/${productId}`, {
       method: 'PUT',
@@ -75,11 +73,14 @@ function UpdateProduct() {
     })
       .then(response => response.json())
       .then(data => {
-        if (data.message === 'Product updated successfully') {
+        console.log('Response Data:', data);
+        if (
+          data.message === 'Product updated successfully' || 
+          data.message === 'No changes were made to the product'
+        ) {
           navigate(`/bakery/manage/${bakeryId}`);
         } else {
           setError('Failed to update product');
-          console.error('Failed update response:', data); // Log the response from the server
         }
       })
       .catch(err => {
@@ -90,62 +91,69 @@ function UpdateProduct() {
   
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold text-center mb-6">
-        Update Product: {product ? product.name : 'Loading...'}
-      </h1>
+    <div className="min-h-screen bg-gradient-to-r from-yellow-50 to-orange-100 p-8">
+  <div className="max-w-lg mx-auto bg-white p-10 shadow-lg rounded-lg">
+    <h1 className="text-4xl font-extrabold text-orange-600 text-center mb-8">
+      Update Product: {product ? product.name : 'Loading...'}
+    </h1>
 
-      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+    {error && <p className="text-red-600 text-center mb-6 font-medium">{error}</p>}
 
-      {product && (
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2" htmlFor="price">
-              Price
-            </label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              value={updatedData.price}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-lg"
-              placeholder="Enter new price"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2" htmlFor="quantity">
-              Quantity
-            </label>
-            <input
-              type="number"
-              id="quantity"
-              name="quantity"
-              value={updatedData.quantity}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-lg"
-              placeholder="Enter new quantity"
-            />
-          </div>
-
-          <div className="flex justify-between gap-4">
-            <button
-              onClick={handleUpdateProduct}
-              className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-            >
-              Update Product
-            </button>
-            <button
-              onClick={() => navigate(`/bakery/manage/${bakeryId}`)}
-              className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-            >
-              Cancel
-            </button>
-          </div>
+    {product && (
+      <form onSubmit={handleUpdateProduct} className="space-y-8">
+        <div className="mb-6">
+          <label htmlFor="price" className="block text-gray-700 text-lg font-semibold mb-3">
+            Price
+          </label>
+          <input
+            id="price"
+            type="number"
+            name="price"
+            value={updatedData.price}
+            onChange={handleInputChange}
+            className="w-full px-5 py-3 border rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            placeholder="Enter new price"
+            required
+          />
         </div>
-      )}
-    </div>
+
+        <div className="mb-6">
+          <label htmlFor="quantity" className="block text-gray-700 text-lg font-semibold mb-3">
+            Quantity
+          </label>
+          <input
+            id="quantity"
+            type="number"
+            name="quantity"
+            value={updatedData.quantity}
+            onChange={handleInputChange}
+            className="w-full px-5 py-3 border rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            placeholder="Enter new quantity"
+            required
+          />
+        </div>
+
+        <div className="flex flex-col gap-6">
+          <button
+            type="submit"
+            className="w-full px-6 py-3 bg-yellow-500 text-white text-lg font-semibold rounded-lg hover:bg-yellow-600 transition"
+          >
+            Update Product
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate(`/bakery/manage/${bakeryId}`)}
+            className="w-full px-6 py-3 bg-gray-500 text-white text-lg font-semibold rounded-lg hover:bg-gray-600 transition"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    )}
+  </div>
+</div>
+
   );
 }
 
