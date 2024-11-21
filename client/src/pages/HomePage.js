@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 function HomePage() {
   const [bakeries, setBakeries] = useState([]);
   const [search, setSearch] = useState('');
-  const navigate = useNavigate(); // To navigate to the login page after logging out
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch bakeries with search query
@@ -17,9 +17,8 @@ function HomePage() {
   }, [search]);
 
   const logout = () => {
-    // Clear the user's token (assuming you're storing it in localStorage)
     localStorage.removeItem('authToken');
-    navigate('/login'); // Redirect to the login page after logging out
+    navigate('/login'); 
   };
 
   return (

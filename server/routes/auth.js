@@ -9,7 +9,7 @@ const secretKey = 'your_secret_key';
 
 // Register User
 router.post('/register', async (req, res) => {
-  const { username, email, password, isOwner } = req.body;  // Removed bakeryId
+  const { username, email, password, isOwner } = req.body;
 
   // Validate required fields
   if (!username || !email || !password) {
@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
       const query = 'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)';
       connection.query(query, [username, email, hashedPassword, isOwner ? 'owner' : 'client'], (error) => {
         if (error) {
-          console.error('Database error:', error);  // Log the error to see if there's a problem with the query
+          console.error('Database error:', error);
           return res.status(500).json({ message: 'Error registering user' });
         }
         res.json({ message: 'User registered successfully' });

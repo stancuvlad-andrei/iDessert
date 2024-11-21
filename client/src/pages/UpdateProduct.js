@@ -85,7 +85,7 @@ function UpdateProduct() {
       })
       .catch(err => {
         setError('Failed to update product');
-        console.error('Error:', err); // Log error details for debugging
+        console.error('Error:', err);
       });
   };
   

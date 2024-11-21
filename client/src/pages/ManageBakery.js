@@ -34,7 +34,7 @@ function ManageBakery() {
 
   // Function to handle adding a new product
   const handleAddProduct = () => {
-    navigate(`/bakery/${id}/add-product`); // Redirect to the add product page
+    navigate(`/bakery/${id}/add-product`);
   };
 
   // Function to handle deleting a product
@@ -67,7 +67,7 @@ function ManageBakery() {
 
   // Function to navigate back to the bakery dashboard
   const handleGoBack = () => {
-    navigate('/dashboard');  // Assuming '/dashboard' is the route for the dashboard
+    navigate('/dashboard');
   };
 
   return (

@@ -158,11 +158,11 @@ router.put('/bakeries/:bakeryId/products/:productId', authenticateToken, (req, r
 
   connection.query(updateQuery, updateValues, (error, results) => {
     if (error) {
-      console.error('Error updating product:', error); // Log the error
+      console.error('Error updating product:', error);
       return res.status(500).json({ message: 'Error updating product' });
     }
     if (results.affectedRows === 0) {
-      console.log('No rows affected, product not found'); // Log if no product was updated
+      console.log('No rows affected, product not found');
       return res.status(404).json({ message: 'Product not found' });
     }
     res.json({ message: 'Product updated successfully' });

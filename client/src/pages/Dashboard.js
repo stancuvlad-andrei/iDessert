@@ -38,7 +38,7 @@ function Dashboard() {
 
   // Function to handle adding a new bakery
   const handleAddBakery = () => {
-    navigate('/add-bakery'); // Redirect to the add bakery page
+    navigate('/add-bakery');
   };
 
   // Function to handle removing a bakery
@@ -60,8 +60,8 @@ function Dashboard() {
 
   // Function to handle logout
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove the token from localStorage
-    navigate('/login'); // Redirect to the login page
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   return (
