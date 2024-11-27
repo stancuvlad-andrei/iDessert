@@ -8,7 +8,7 @@ function Dashboard() {
 
   const token = localStorage.getItem('token');
 
-  // Redirect if no token (not authenticated)
+  // Redirect if no token
   useEffect(() => {
     if (!token) {
       navigate('/login');
@@ -36,12 +36,12 @@ function Dashboard() {
       });
   }, [token]);
 
-  // Function to handle adding a new bakery
+  // Function for adding a new bakery
   const handleAddBakery = () => {
     navigate('/add-bakery');
   };
 
-  // Function to handle removing a bakery
+  // Function for removing a bakery
   const handleRemoveBakery = (bakeryId) => {
     fetch(`/api/bakeries/${bakeryId}`, {
       method: 'DELETE',
@@ -58,7 +58,7 @@ function Dashboard() {
       });
   };
 
-  // Function to handle logout
+  // Function for logout
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');

@@ -14,7 +14,7 @@ router.get('/bakeries', (req, res) => {
   });
 });
 
-// Fetch a specific bakery's details (including products and reviews)
+// Fetch a specific bakery's details
 router.get('/bakeries/:id', (req, res) => {
   const bakeryId = req.params.id;
 
@@ -64,7 +64,7 @@ router.post('/bakeries', authenticateToken, (req, res) => {
 router.delete('/bakeries/:id', authenticateToken, (req, res) => {
   const bakeryId = req.params.id;
 
-  // First, check if the bakery exists
+  // Check if the bakery exists
   const checkBakeryQuery = 'SELECT * FROM bakeries WHERE id = ?';
   connection.query(checkBakeryQuery, [bakeryId], (error, results) => {
     if (error) {
@@ -74,7 +74,7 @@ router.delete('/bakeries/:id', authenticateToken, (req, res) => {
       return res.status(404).json({ message: 'Bakery not found' });
     }
 
-    // Now delete the bakery
+    // Delete the bakery
     const deleteBakeryQuery = 'DELETE FROM bakeries WHERE id = ?';
     connection.query(deleteBakeryQuery, [bakeryId], (error, results) => {
       if (error) {

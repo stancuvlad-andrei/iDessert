@@ -26,11 +26,11 @@ function AddProduct() {
     })
       .then(response => response.json())
       .then(data => {
-        console.log('Response:', data);  // Add this for logging the response
+        console.log('Response:', data);
         if (data.message === 'Product added successfully') {
-          navigate(`/bakery/manage/${id}`);  // Redirect back to manage bakery page if successful
+          navigate(`/bakery/manage/${id}`);
         } else {
-          alert('Error adding product: ' + data.message);  // Handle failure
+          alert('Error adding product: ' + data.message);
         }
       })
       .catch(err => {
@@ -100,10 +100,9 @@ function AddProduct() {
             Add Product
           </button>
 
-          {/* Updated Cancel Button */}
           <button
             type="button"
-            onClick={() => navigate(`/bakery/manage/${id}`)}  // Navigate to the manage bakery page
+            onClick={() => navigate(`/bakery/manage/${id}`)}
             className="w-full py-3 bg-gray-500 text-white text-lg font-semibold rounded-lg hover:bg-gray-600 transition mt-6"
           >
             Cancel

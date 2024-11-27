@@ -32,12 +32,12 @@ function ManageBakery() {
       });
   }, [id, token, navigate]);
 
-  // Function to handle adding a new product
+  // Function for adding a new product
   const handleAddProduct = () => {
     navigate(`/bakery/${id}/add-product`);
   };
 
-  // Function to handle deleting a product
+  // Function for deleting a product
   const handleDeleteProduct = (productId) => {
     fetch(`/api/bakeries/${id}/products/${productId}`, {  // Use bakery ID from URL
       method: 'DELETE',
@@ -59,13 +59,12 @@ function ManageBakery() {
       });
   };
 
-  // Function to handle updating product (price/quantity)
+  // Function for updating product
   const handleUpdateProduct = (productId) => {
     navigate(`/bakery/${id}/product/${productId}/update`);
   };
   
 
-  // Function to navigate back to the bakery dashboard
   const handleGoBack = () => {
     navigate('/dashboard');
   };
@@ -121,7 +120,6 @@ function ManageBakery() {
       )}
     </div>
 
-    {/* Go back to dashboard button */}
     <div className="text-center mt-6">
       <button
         onClick={handleGoBack}

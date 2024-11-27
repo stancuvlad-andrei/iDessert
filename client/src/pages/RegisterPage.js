@@ -6,12 +6,12 @@ function RegisterPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('Form data updated:', formData);  // Log the form data whenever it changes
+    console.log('Form data updated:', formData);
   }, [formData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Submitting form with data:', formData);  // Check if this is logged
+    console.log('Submitting form with data:', formData);
 
     fetch('/api/register', {
       method: 'POST',
