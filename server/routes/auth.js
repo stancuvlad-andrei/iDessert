@@ -65,5 +65,22 @@ router.post('/login', (req, res) => {
   });
 });
 
+// Fetch User Details (for Account Page)
+router.get('/account', authenticateToken, (req, res) => {
+  const userId = req.user.id; // Extracted from the JWT token
+
+  const query = 'SELECT id, username, email, role FROM users WHERE id = ?';
+  connection.query(query, [userId], (error, results) => {
+    if (error) {
+      return res.status(500).json({ message: 'Error fetching user details' });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const user = results[0];
+    res.json({ user });
+  });
+});
 
 module.exports = router;

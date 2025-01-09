@@ -108,22 +108,43 @@ router.post('/bakeries/:id/products', authenticateToken, (req, res) => {
   });
 });
 
-// Fetch a specific product from a bakery
-router.get('/bakeries/:bakeryId/products/:productId', (req, res) => {
-  const { bakeryId, productId } = req.params;
+// Fetch random products from bakeries with good reviews
+router.get('/random-products', (req, res) => {
+  const query = `
+    SELECT DISTINCT p.* 
+    FROM products p
+    JOIN bakeries b ON p.bakery_id = b.id
+    JOIN reviews r ON b.id = r.bakery_id
+    WHERE r.sentiment = 'good'
+    ORDER BY RAND()
+    LIMIT 3;
+  `;
 
-  const query = 'SELECT * FROM products WHERE bakery_id = ? AND id = ?';
-  connection.query(query, [bakeryId, productId], (error, results) => {
+  connection.query(query, (error, results) => {
     if (error) {
-      return res.status(500).json({ message: 'Error fetching product data' });
+      console.error('Error fetching random products:', error);
+      return res.status(500).json({ message: 'Error fetching random products' });
     }
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-    res.json({ product: results[0] });
+    res.json({ products: results });
   });
 });
 
+router.post('/checkout', async (req, res) => {
+  const { cart } = req.body;
+
+  try {
+    // Loop through the cart and update product quantities in the database
+    for (const item of cart) {
+      const updateQuery = 'UPDATE products SET quantity = quantity - ? WHERE id = ?';
+      await connection.promise().query(updateQuery, [item.quantity, item.id]);
+    }
+
+    res.status(200).json({ message: 'Checkout successful' });
+  } catch (error) {
+    console.error('Checkout error:', error);
+    res.status(500).json({ message: 'Failed to process checkout' });
+  }
+});
 
 // Update an existing product in a bakery (PUT)
 router.put('/bakeries/:bakeryId/products/:productId', authenticateToken, (req, res) => {
