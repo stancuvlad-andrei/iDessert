@@ -1,15 +1,18 @@
-import React, { useEffect, useState, useContext } from 'react'; // Add useContext
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { CartContext } from '../context/CartContext'; // Import CartContext
+import { CartContext } from '../context/CartContext';
 
 function BakeryPage() {
   const { id } = useParams();
   const [bakery, setBakery] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { cart, addToCart } = useContext(CartContext); // Use the global cart state
+  const { cart, addToCart } = useContext(CartContext);
+
+  const visitLogged = useRef(false); // Moved outside useEffect
 
   useEffect(() => {
+    // Fetch bakery details
     fetch(`/api/bakeries/${id}`)
       .then((res) => {
         if (!res.ok) {
@@ -30,7 +33,15 @@ function BakeryPage() {
         setError('Failed to fetch bakery details');
         setLoading(false);
       });
-  }, [id]);
+
+    // Log a visit if it hasn't been logged
+    if (!visitLogged.current) {
+      visitLogged.current = true;
+      fetch(`/api/bakeries/${id}/visit`, { method: 'POST' }).catch((err) => {
+        console.error('Failed to log visit', err);
+      });
+    }
+  }, [id]); // Dependency array ensures it only runs when the `id` changes
 
   if (loading) {
     return (
@@ -68,19 +79,14 @@ function BakeryPage() {
       <nav className="bg-white shadow-md fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
             <Link to="/" className="text-2xl font-bold text-orange-600">
               iDessert
             </Link>
-
-            {/* Search Bar */}
             <input
               type="text"
               placeholder="Search for bakeries..."
               className="w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
-
-            {/* Account, Cart, and All Bakeries */}
             <div className="flex items-center space-x-6">
               <Link to="/all-bakeries" className="text-gray-700 hover:text-orange-600">
                 All Bakeries
@@ -91,7 +97,7 @@ function BakeryPage() {
               <Link to="/cart" className="relative">
                 <span className="text-gray-700 hover:text-orange-600">Cart</span>
                 <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-2 py-1">
-                  {cart.length} {/* Dynamic cart count */}
+                  {cart.length}
                 </span>
               </Link>
             </div>
@@ -116,7 +122,7 @@ function BakeryPage() {
                 <div className="mt-auto">
                   {product.quantity > 0 && (
                     <button
-                      onClick={() => addToCart(product)} // Use the global addToCart function
+                      onClick={() => addToCart(product)}
                       className="mt-4 w-full px-4 py-2 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition"
                     >
                       Add to Cart
@@ -149,12 +155,9 @@ function BakeryPage() {
       <footer className="bg-white shadow-md mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
-            {/* Logo */}
             <Link to="/" className="text-2xl font-bold text-orange-600">
               iDessert
             </Link>
-
-            {/* Text */}
             <p className="text-gray-600">© 2024 iDessert. All rights reserved.</p>
           </div>
         </div>

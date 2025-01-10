@@ -11,29 +11,42 @@ function CartPage() {
   // Function to handle checkout
   const handleCheckout = async () => {
     try {
-      // Simulate a purchase by sending the cart data to the backend
+      // Ensure that each item in the cart has a bakeryId and convert price to number
+      const cartWithBakeryId = cart.map((item) => ({
+        ...item,
+        bakeryId: item.bakery_id, // Rename bakery_id to bakeryId
+        price: parseFloat(item.price), // Convert price to number
+      }));
+  
+      // Send the cart data and bakeryId to the backend
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ cart }),
+        body: JSON.stringify({ cart: cartWithBakeryId, bakeryId: cartWithBakeryId[0]?.bakeryId }), // Pass bakeryId from cart
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to process checkout');
       }
-
-      // Clear the cart after successful checkout
+  
+      // Wait for backend confirmation of successful logging
+      const result = await response.json();
+      if (result.message !== 'Checkout successful') {
+        throw new Error('Logging failed on the backend');
+      }
+  
+      // Clear the cart after successful logging
       clearCart();
-
-      // Optionally, redirect to a confirmation page or show a success message
       alert('Purchase successful! Your cart has been cleared.');
     } catch (error) {
       console.error('Checkout error:', error);
       alert('Failed to process checkout. Please try again.');
     }
   };
+  
+  
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

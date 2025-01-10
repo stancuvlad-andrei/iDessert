@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function UpdateProduct() {
-  const { bakeryId, productId } = useParams(); // Get bakery and product IDs from the URL
+  const { bakeryId, productId } = useParams();
   const [product, setProduct] = useState(null);
+  const [bakeries, setBakeries] = useState([]);
   const [error, setError] = useState(null);
   const [updatedData, setUpdatedData] = useState({
     price: '',
-    quantity: ''
+    quantity: '',
   });
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
@@ -17,53 +18,76 @@ function UpdateProduct() {
       navigate('/login');
     }
 
+    // Fetch all bakeries
+    fetch('/api/bakeries', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch bakeries');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.bakeries) {
+          setBakeries(data.bakeries);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch bakeries', err);
+      });
+
     // Fetch product details
     fetch(`/api/bakeries/${bakeryId}/products/${productId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch product data');
+        }
+        return response.json();
       })
-      .then(response => response.json())
-      .then(data => {
+      .then((data) => {
         if (data.product) {
           setProduct(data.product);
           setUpdatedData({
             price: data.product.price,
-            quantity: data.product.quantity
+            quantity: data.product.quantity,
           });
         } else {
-          setError('Failed to fetch product data');
+          setError('Product data not found');
         }
       })
-      .catch(err => {
-        setError('Failed to fetch product data');
+      .catch((err) => {
+        setError(err.message);
+        console.error('Failed to fetch product data', err);
       });
   }, [bakeryId, productId, token, navigate]);
 
-  // Function to handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUpdatedData(prevData => ({
+    setUpdatedData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  // Function to handle updating the product
   const handleUpdateProduct = () => {
     const { price, quantity } = updatedData;
-  
-    // Make sure both fields are filled out
+
     if (!price || !quantity) {
       setError('Please fill in all fields');
       return;
     }
-  
-    // Send updated product data to the server
+
     fetch(`/api/bakeries/${bakeryId}/products/${productId}`, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -71,89 +95,127 @@ function UpdateProduct() {
         quantity,
       }),
     })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Response Data:', data);
-        if (
-          data.message === 'Product updated successfully' || 
-          data.message === 'No changes were made to the product'
-        ) {
-          navigate(`/bakery/manage/${bakeryId}`);
-        } else {
-          setError('Failed to update product');
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to update product');
         }
+        return response.json();
       })
-      .catch(err => {
-        setError('Failed to update product');
-        console.error('Error:', err);
+      .then(() => {
+        navigate(`/bakery/manage/${bakeryId}`);
+      })
+      .catch((err) => {
+        setError(err.message);
+        console.error('Failed to update product', err);
       });
   };
-  
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-yellow-50 to-orange-100 p-8">
-  <div className="max-w-lg mx-auto bg-white p-10 shadow-lg rounded-lg">
-    <h1 className="text-4xl font-extrabold text-orange-600 text-center mb-8">
-      Update Product: {product ? product.name : 'Loading...'}
-    </h1>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Vertical Menu on the Left */}
+      <div className="w-64 bg-white shadow-lg p-4">
+        <h2 className="text-xl font-bold text-orange-600 mb-4">Your Bakeries</h2>
 
-    {error && <p className="text-red-600 text-center mb-6 font-medium">{error}</p>}
+        {/* Search Bar */}
+        <input
+          type="text"
+          placeholder="Search bakeries..."
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
 
-    {product && (
-      <form onSubmit={handleUpdateProduct} className="space-y-8">
-        <div className="mb-6">
-          <label htmlFor="price" className="block text-gray-700 text-lg font-semibold mb-3">
-            Price
-          </label>
-          <input
-            id="price"
-            type="number"
-            name="price"
-            value={updatedData.price}
-            onChange={handleInputChange}
-            className="w-full px-5 py-3 border rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            placeholder="Enter new price"
-            required
-          />
+        {/* List of Bakeries */}
+        <ul className="space-y-2">
+          {bakeries.map((bakery) => (
+            <li
+              key={bakery.id}
+              className={`p-2 rounded-lg cursor-pointer ${
+                bakery.id === parseInt(bakeryId)
+                  ? 'bg-orange-100 text-orange-600'
+                  : 'hover:bg-gray-100'
+              }`}
+              onClick={() => navigate(`/bakery/manage/${bakery.id}`)}
+            >
+              {bakery.name}
+            </li>
+          ))}
+        </ul>
+
+        {/* Add New Bakery Button */}
+        <button
+          onClick={() => navigate('/add-bakery')}
+          className="w-full mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+        >
+          Add New Bakery
+        </button>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 p-6">
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h1 className="text-2xl font-bold text-orange-600 mb-6">
+            Update Product: {product ? product.name : 'Loading...'}
+          </h1>
+
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+
+          {product && (
+            <form className="space-y-4">
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">Price</label>
+                <input
+                  type="number"
+                  name="price"
+                  value={updatedData.price}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">Quantity</label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={updatedData.quantity}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  required
+                />
+              </div>
+
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={handleUpdateProduct}
+                  className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  Update Product
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/bakery/manage/${bakeryId}`)}
+                  className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
         </div>
+      </div>
 
-        <div className="mb-6">
-          <label htmlFor="quantity" className="block text-gray-700 text-lg font-semibold mb-3">
-            Quantity
-          </label>
-          <input
-            id="quantity"
-            type="number"
-            name="quantity"
-            value={updatedData.quantity}
-            onChange={handleInputChange}
-            className="w-full px-5 py-3 border rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            placeholder="Enter new quantity"
-            required
-          />
-        </div>
-
-        <div className="flex flex-col gap-6">
-          <button
-            type="submit"
-            className="w-full px-6 py-3 bg-yellow-500 text-white text-lg font-semibold rounded-lg hover:bg-yellow-600 transition"
-          >
-            Update Product
-          </button>
-
-          <button
-            type="button"
-            onClick={() => navigate(`/bakery/manage/${bakeryId}`)}
-            className="w-full px-6 py-3 bg-gray-500 text-white text-lg font-semibold rounded-lg hover:bg-gray-600 transition"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
-    )}
-  </div>
-</div>
-
+      {/* Logout Button */}
+      <button
+        onClick={() => {
+          localStorage.removeItem('token');
+          navigate('/login');
+        }}
+        className="fixed bottom-4 right-4 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500"
+      >
+        Logout
+      </button>
+    </div>
   );
 }
 

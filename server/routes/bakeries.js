@@ -89,7 +89,6 @@ router.delete('/bakeries/:id', authenticateToken, (req, res) => {
   });
 });
 
-
 // Add a new product to a specific bakery (POST)
 router.post('/bakeries/:id/products', authenticateToken, (req, res) => {
   const bakeryId = req.params.id;
@@ -105,6 +104,22 @@ router.post('/bakeries/:id/products', authenticateToken, (req, res) => {
       return res.status(500).json({ message: 'Error adding product' });
     }
     res.status(201).json({ message: 'Product added successfully' });
+  });
+});
+
+// Fetch a specific product from a bakery
+router.get('/bakeries/:bakeryId/products/:productId', (req, res) => {
+  const { bakeryId, productId } = req.params;
+
+  const query = 'SELECT * FROM products WHERE id = ? AND bakery_id = ?';
+  connection.query(query, [productId, bakeryId], (error, results) => {
+    if (error) {
+      return res.status(500).json({ message: 'Error fetching product' });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.json({ product: results[0] });
   });
 });
 
@@ -130,14 +145,32 @@ router.get('/random-products', (req, res) => {
 });
 
 router.post('/checkout', async (req, res) => {
-  const { cart } = req.body;
+  const { cart, bakeryId } = req.body; // Include bakeryId from the request body
+  let totalAmount = 0; // Variable to keep track of the total order amount
 
   try {
     // Loop through the cart and update product quantities in the database
     for (const item of cart) {
+      // Calculate the total amount for the current item
+      const productTotal = item.quantity * item.price; // Assuming price is available in the cart item
+      totalAmount += productTotal;
+
+      // Update product quantity
       const updateQuery = 'UPDATE products SET quantity = quantity - ? WHERE id = ?';
       await connection.promise().query(updateQuery, [item.quantity, item.id]);
+
+      // Insert order into orders table
+      const orderQuery = 'INSERT INTO orders (bakery_id, product_id, quantity, total_amount) VALUES (?, ?, ?, ?)';
+      await connection.promise().query(orderQuery, [bakeryId, item.id, item.quantity, productTotal]);
     }
+
+    // Insert or update revenue for the bakery
+    const revenueQuery = `
+      INSERT INTO revenue (bakery_id, amount) 
+      VALUES (?, ?) 
+      ON DUPLICATE KEY UPDATE amount = amount + ?
+    `;
+    await connection.promise().query(revenueQuery, [bakeryId, totalAmount, totalAmount]);
 
     res.status(200).json({ message: 'Checkout successful' });
   } catch (error) {
@@ -145,6 +178,7 @@ router.post('/checkout', async (req, res) => {
     res.status(500).json({ message: 'Failed to process checkout' });
   }
 });
+
 
 // Update an existing product in a bakery (PUT)
 router.put('/bakeries/:bakeryId/products/:productId', authenticateToken, (req, res) => {
@@ -190,7 +224,6 @@ router.put('/bakeries/:bakeryId/products/:productId', authenticateToken, (req, r
   });
 });
 
-
 // Delete a product from a bakery (DELETE)
 router.delete('/bakeries/:bakeryId/products/:productId', authenticateToken, (req, res) => {
   const { bakeryId, productId } = req.params;
@@ -206,5 +239,55 @@ router.delete('/bakeries/:bakeryId/products/:productId', authenticateToken, (req
     res.json({ message: 'Product removed successfully' });
   });
 });
+
+// Fetch bakery telemetry (visits, orders, revenue)
+router.get('/bakeries/:id/telemetry', authenticateToken, (req, res) => {
+  const bakeryId = req.params.id;
+
+  // Fetch total visits
+  const visitsQuery = 'SELECT COUNT(*) AS visits FROM visits WHERE bakery_id = ?';
+  // Fetch total orders and revenue
+  const ordersQuery = `
+    SELECT 
+      COUNT(*) AS orders, 
+      SUM(total_amount) AS revenue 
+    FROM orders 
+    WHERE bakery_id = ?
+  `;
+
+  connection.query(visitsQuery, [bakeryId], (error, visitsResults) => {
+    if (error) {
+      return res.status(500).json({ message: 'Error fetching visits' });
+    }
+
+    connection.query(ordersQuery, [bakeryId], (error, ordersResults) => {
+      if (error) {
+        return res.status(500).json({ message: 'Error fetching orders' });
+      }
+
+      const telemetry = {
+        visits: visitsResults[0].visits,
+        orders: ordersResults[0].orders,
+        revenue: ordersResults[0].revenue || 0,
+      };
+
+      res.json({ telemetry });
+    });
+  });
+});
+
+// Log a visit to a bakery
+router.post('/bakeries/:id/visit', (req, res) => {
+  const bakeryId = req.params.id;
+
+  const query = 'INSERT INTO visits (bakery_id) VALUES (?)';
+  connection.query(query, [bakeryId], (error, results) => {
+    if (error) {
+      return res.status(500).json({ message: 'Error logging visit' });
+    }
+    res.json({ message: 'Visit logged successfully' });
+  }); 
+});
+
 
 module.exports = router;

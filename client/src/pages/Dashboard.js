@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
   const [bakeries, setBakeries] = useState([]);
+  const [recentProducts, setRecentProducts] = useState([]);
+  const [selectedBakery, setSelectedBakery] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -15,26 +18,30 @@ function Dashboard() {
     }
   }, [token, navigate]);
 
-  // Fetch bakeries when the component mounts
+  // Fetch bakeries and recent products when the component mounts
   useEffect(() => {
     if (!token) return;
 
     // Fetch all bakeries owned by the user
     fetch('/api/bakeries', {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         if (data.bakeries) {
           setBakeries(data.bakeries);
+          // Only set the selectedBakery if it hasn't been set yet
+          if (data.bakeries.length > 0 && !selectedBakery) {
+            setSelectedBakery(data.bakeries[0]); // Select the first bakery by default
+          }
         }
       })
-      .catch(err => {
+      .catch((err) => {
         setError('Failed to fetch bakeries');
       });
-  }, [token]);
+  }, [token, selectedBakery]); // Only re-run if token or selectedBakery changes
 
   // Function for adding a new bakery
   const handleAddBakery = () => {
@@ -46,14 +53,17 @@ function Dashboard() {
     fetch(`/api/bakeries/${bakeryId}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     })
-      .then(response => response.json())
+      .then((response) => response.json())
       .then(() => {
-        setBakeries(bakeries.filter(bakery => bakery.id !== bakeryId));
+        setBakeries(bakeries.filter((bakery) => bakery.id !== bakeryId));
+        if (selectedBakery?.id === bakeryId) {
+          setSelectedBakery(null); // Clear selected bakery if it was removed
+        }
       })
-      .catch(err => {
+      .catch((err) => {
         setError('Failed to remove bakery');
       });
   };
@@ -64,60 +74,89 @@ function Dashboard() {
     navigate('/login');
   };
 
+  // Filter bakeries based on search query
+  const filteredBakeries = bakeries.filter((bakery) =>
+    bakery.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-r from-yellow-50 to-orange-100 p-6">
-  <div className="max-w-5xl mx-auto bg-white p-8 shadow-lg rounded-xl flex flex-col justify-between">
-    <div>
-      <h1 className="text-4xl font-extrabold text-orange-600 text-center mb-6">Your Bakeries</h1>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Vertical Menu on the Left */}
+      <div className="w-64 bg-white shadow-lg p-4">
+        <h2 className="text-xl font-bold text-orange-600 mb-4">Your Bakeries</h2>
 
-      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        {/* Search Bar */}
+        <input
+          type="text"
+          placeholder="Search bakeries..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
 
-      <div className="flex justify-center mb-8">
+        {/* List of Bakeries */}
+        <ul className="space-y-2">
+          {filteredBakeries.map((bakery) => (
+            <li
+              key={bakery.id}
+              className={`p-2 rounded-lg cursor-pointer ${
+                selectedBakery?.id === bakery.id
+                  ? 'bg-orange-100 text-orange-600'
+                  : 'hover:bg-gray-100'
+              }`}
+              onClick={() => setSelectedBakery(bakery)}
+            >
+              {bakery.name}
+            </li>
+          ))}
+        </ul>
+
+        {/* Add New Bakery Button */}
         <button
           onClick={handleAddBakery}
-          className="px-8 py-3 bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 transition"
+          className="w-full mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
         >
           Add New Bakery
         </button>
       </div>
 
-      {bakeries.length > 0 ? (
-        bakeries.map((bakery) => (
-          <div key={bakery.id} className="bg-white shadow-lg rounded-xl p-6 mb-8 hover:border-2 hover:border-yellow-500 transition">
-            <h3 className="text-2xl font-semibold text-gray-800">{bakery.name}</h3>
-            <p className="text-lg text-gray-600">{bakery.address}</p>
-            <div className="flex justify-between mt-6">
+      {/* Main Content Area */}
+      <div className="flex-1 p-6">
+        {/* Selected Bakery Details */}
+        {selectedBakery ? (
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-bold text-orange-600 mb-4">{selectedBakery.name}</h2>
+            <p className="text-gray-600 mb-4">{selectedBakery.address}</p>
+
+            {/* Actions */}
+            <div className="flex space-x-4">
               <button
-                onClick={() => navigate(`/bakery/manage/${bakery.id}`)}
-                className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                onClick={() => navigate(`/bakery/manage/${selectedBakery.id}`)}
+                className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 Manage Bakery
               </button>
               <button
-                onClick={() => handleRemoveBakery(bakery.id)}
-                className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                onClick={() => handleRemoveBakery(selectedBakery.id)}
+                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 Remove Bakery
               </button>
             </div>
           </div>
-        ))
-      ) : (
-        <p className="text-center text-gray-600 text-xl">You don't have any bakeries yet.</p>
-      )}
-    </div>
+        ) : (
+          <p className="text-gray-600">Select a bakery to view details.</p>
+        )}
+      </div>
 
-    <div className="flex justify-center mt-auto mb-4">
+      {/* Logout Button */}
       <button
         onClick={handleLogout}
-        className="px-8 py-3 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition"
+        className="fixed bottom-4 right-4 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500"
       >
         Logout
       </button>
     </div>
-  </div>
-</div>
-
   );
 }
 
