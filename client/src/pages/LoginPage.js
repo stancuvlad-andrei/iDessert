@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
+  
     fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -17,10 +24,17 @@ function LoginPage() {
         if (data.token) {
           localStorage.setItem('token', data.token);
           localStorage.setItem('isOwner', data.isOwner);
+          login();
           navigate(data.isOwner ? '/dashboard' : '/');
         } else {
-          alert(data.message);
+          setError(data.message || 'Login failed. Please try again.');
         }
+      })
+      .catch((error) => {
+        setError('An error occurred. Please try again.');
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -51,11 +65,15 @@ function LoginPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
             <button
               type="submit"
-              className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              disabled={loading}
+              className={`w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
           <button

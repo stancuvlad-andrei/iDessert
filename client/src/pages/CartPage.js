@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { CartContext } from '../context/CartContext'; // Import the CartContext
+import { CartContext } from '../context/CartContext';
 
 function CartPage() {
-  const { cart, removeFromCart, updateQuantity, clearCart } = useContext(CartContext); // Use the global cart state
+  const { cart, removeFromCart, updateQuantity, clearCart } = useContext(CartContext);
 
   // Calculate the total price of the cart
   const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -14,8 +14,8 @@ function CartPage() {
       // Ensure that each item in the cart has a bakeryId and convert price to number
       const cartWithBakeryId = cart.map((item) => ({
         ...item,
-        bakeryId: item.bakery_id, // Rename bakery_id to bakeryId
-        price: parseFloat(item.price), // Convert price to number
+        bakeryId: item.bakery_id,
+        price: parseFloat(item.price),
       }));
   
       // Send the cart data and bakeryId to the backend
@@ -24,7 +24,7 @@ function CartPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ cart: cartWithBakeryId, bakeryId: cartWithBakeryId[0]?.bakeryId }), // Pass bakeryId from cart
+        body: JSON.stringify({ cart: cartWithBakeryId, bakeryId: cartWithBakeryId[0]?.bakeryId }),
       });
   
       if (!response.ok) {
@@ -97,7 +97,7 @@ function CartPage() {
           >
             Continue Shopping
           </Link>
-          {cart.length > 0 && ( // Only show the Checkout button if the cart is not empty
+          {cart.length > 0 && (
             <button
               onClick={handleCheckout}
               className="px-8 py-4 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition"

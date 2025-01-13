@@ -7,9 +7,11 @@ function BakeryPage() {
   const [bakery, setBakery] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [reviewText, setReviewText] = useState('');
+  const [sentiment, setSentiment] = useState('good');
   const { cart, addToCart } = useContext(CartContext);
 
-  const visitLogged = useRef(false); // Moved outside useEffect
+  const visitLogged = useRef(false);
 
   useEffect(() => {
     // Fetch bakery details
@@ -41,7 +43,39 @@ function BakeryPage() {
         console.error('Failed to log visit', err);
       });
     }
-  }, [id]); // Dependency array ensures it only runs when the `id` changes
+  }, [id]);
+
+  const handleAddReview = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`/api/bakeries/${id}/reviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          review: reviewText,
+          sentiment: sentiment,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add review');
+      }
+
+      // Refresh the bakery details to show the new review
+      const updatedBakery = await fetch(`/api/bakeries/${id}`).then((res) => res.json());
+      setBakery(updatedBakery.bakery);
+
+      // Clear the form
+      setReviewText('');
+      setSentiment('good');
+    } catch (error) {
+      console.error('Error adding review:', error);
+      setError('Failed to add review');
+    }
+  };
 
   if (loading) {
     return (
@@ -149,6 +183,37 @@ function BakeryPage() {
         ) : (
           <p className="text-xl text-gray-500">No reviews yet.</p>
         )}
+
+        {/* Add Review Form */}
+        <div className="bg-white p-6 rounded-lg shadow-md mb-12">
+          <h3 className="text-2xl font-bold text-orange-600 mb-4">Add a Review</h3>
+          <form onSubmit={handleAddReview}>
+            <textarea
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+              placeholder="Write your review here..."
+              required
+            />
+            <div className="mb-4">
+              <label className="block text-gray-700">Sentiment:</label>
+              <select
+                value={sentiment}
+                onChange={(e) => setSentiment(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-lg"
+              >
+                <option value="good">Good</option>
+                <option value="bad">Bad</option>
+              </select>
+            </div>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition"
+            >
+              Submit Review
+            </button>
+          </form>
+        </div>
       </div>
 
       {/* Footer */}

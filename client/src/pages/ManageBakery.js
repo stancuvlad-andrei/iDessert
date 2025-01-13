@@ -6,6 +6,7 @@ function ManageBakery() {
   const [bakery, setBakery] = useState(null);
   const [bakeries, setBakeries] = useState([]);
   const [products, setProducts] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [telemetry, setTelemetry] = useState({
     visits: 0,
     orders: 0,
@@ -36,7 +37,7 @@ function ManageBakery() {
         setError('Failed to fetch bakeries');
       });
 
-    // Fetch bakery details and products
+    // Fetch bakery details, products, and reviews
     fetch(`/api/bakeries/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -47,6 +48,7 @@ function ManageBakery() {
         if (data.bakery) {
           setBakery(data.bakery);
           setProducts(data.bakery.products);
+          setReviews(data.bakery.reviews);
         }
       })
       .catch((err) => {
@@ -61,7 +63,6 @@ function ManageBakery() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log('Telemetry data:', data.telemetry); // Log the data for debugging
         if (data.telemetry) {
           setTelemetry(data.telemetry);
         }
@@ -101,7 +102,7 @@ function ManageBakery() {
   };
 
   const handleCancel = () => {
-    navigate('/dashboard'); // Replace with your actual dashboard route
+    navigate('/dashboard');
   };
 
   return (
@@ -174,51 +175,69 @@ function ManageBakery() {
             </div>
           </div>
 
-
-
-          <div className="mb-6 flex space-x-4">
-            <button
-              onClick={handleAddProduct}
-              className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            >
-              Add Product
-            </button>
-            <button
-              onClick={handleCancel}
-              className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Cancel
-            </button>
-          </div>
-
-          {products.length > 0 ? (
-            products.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white p-4 rounded-lg shadow-md mb-4"
+          {/* Products Section */}
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Products</h2>
+            <div className="mb-6 flex space-x-4">
+              <button
+                onClick={handleAddProduct}
+                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
-                <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
-                <p className="text-gray-600">{product.description}</p>
-                <p className="text-gray-800">Price: ${product.price}</p>
-                <p className="text-gray-800">Quantity: {product.quantity}</p>
-                <div className="flex space-x-4 mt-4">
-                  <button
-                    onClick={() => handleUpdateProduct(product.id)}
-                    className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  >
-                    Update Product
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProduct(product.id)}
-                    className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500"
-                  >
-                    Delete Product
-                  </button>
+                Add Product
+              </button>
+              <button
+                onClick={handleCancel}
+                className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                Cancel
+              </button>
+            </div>
+
+            {products.length > 0 ? (
+              products.map((product) => (
+                <div
+                  key={product.id}
+                  className="bg-white p-4 rounded-lg shadow-md mb-4"
+                >
+                  <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
+                  <p className="text-gray-600">{product.description}</p>
+                  <p className="text-gray-800">Price: ${product.price}</p>
+                  <p className="text-gray-800">Quantity: {product.quantity}</p>
+                  <div className="flex space-x-4 mt-4">
+                    <button
+                      onClick={() => handleUpdateProduct(product.id)}
+                      className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    >
+                      Update Product
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product.id)}
+                      className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    >
+                      Delete Product
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              ))
+            ) : (
+              <p className="text-gray-600">No products found for this bakery.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="bg-white p-6 rounded-lg shadow-md mt-6">
+          <h2 className="text-2xl font-bold text-orange-600 mb-6">Reviews</h2>
+          {reviews && reviews.length > 0 ? (
+            <div className="space-y-4">
+              {reviews.map((review, index) => (
+                <div key={index} className="bg-gray-50 p-4 rounded-lg shadow-md">
+                  <p className="text-gray-700">{review}</p>
+                </div>
+              ))}
+            </div>
           ) : (
-            <p className="text-gray-600">No products found for this bakery.</p>
+            <p className="text-gray-500">No reviews yet.</p>
           )}
         </div>
       </div>

@@ -144,27 +144,23 @@ router.get('/random-products', (req, res) => {
   });
 });
 
+// Checkout route
 router.post('/checkout', async (req, res) => {
-  const { cart, bakeryId } = req.body; // Include bakeryId from the request body
-  let totalAmount = 0; // Variable to keep track of the total order amount
+  const { cart, bakeryId } = req.body;
+  let totalAmount = 0;
 
   try {
-    // Loop through the cart and update product quantities in the database
     for (const item of cart) {
-      // Calculate the total amount for the current item
-      const productTotal = item.quantity * item.price; // Assuming price is available in the cart item
+      const productTotal = item.quantity * item.price;
       totalAmount += productTotal;
 
-      // Update product quantity
       const updateQuery = 'UPDATE products SET quantity = quantity - ? WHERE id = ?';
       await connection.promise().query(updateQuery, [item.quantity, item.id]);
 
-      // Insert order into orders table
       const orderQuery = 'INSERT INTO orders (bakery_id, product_id, quantity, total_amount) VALUES (?, ?, ?, ?)';
       await connection.promise().query(orderQuery, [bakeryId, item.id, item.quantity, productTotal]);
     }
 
-    // Insert or update revenue for the bakery
     const revenueQuery = `
       INSERT INTO revenue (bakery_id, amount) 
       VALUES (?, ?) 
@@ -178,7 +174,6 @@ router.post('/checkout', async (req, res) => {
     res.status(500).json({ message: 'Failed to process checkout' });
   }
 });
-
 
 // Update an existing product in a bakery (PUT)
 router.put('/bakeries/:bakeryId/products/:productId', authenticateToken, (req, res) => {
@@ -205,7 +200,6 @@ router.put('/bakeries/:bakeryId/products/:productId', authenticateToken, (req, r
     updateValues.push(quantity);
   }
 
-  // Remove the trailing comma and space
   updateQuery = updateQuery.slice(0, -2);
   updateQuery += ' WHERE id = ? AND bakery_id = ?';
 
@@ -217,7 +211,6 @@ router.put('/bakeries/:bakeryId/products/:productId', authenticateToken, (req, r
       return res.status(500).json({ message: 'Error updating product' });
     }
     if (results.affectedRows === 0) {
-      console.log('No rows affected, product not found');
       return res.status(404).json({ message: 'Product not found' });
     }
     res.json({ message: 'Product updated successfully' });
@@ -244,9 +237,7 @@ router.delete('/bakeries/:bakeryId/products/:productId', authenticateToken, (req
 router.get('/bakeries/:id/telemetry', authenticateToken, (req, res) => {
   const bakeryId = req.params.id;
 
-  // Fetch total visits
   const visitsQuery = 'SELECT COUNT(*) AS visits FROM visits WHERE bakery_id = ?';
-  // Fetch total orders and revenue
   const ordersQuery = `
     SELECT 
       COUNT(*) AS orders, 
@@ -286,8 +277,22 @@ router.post('/bakeries/:id/visit', (req, res) => {
       return res.status(500).json({ message: 'Error logging visit' });
     }
     res.json({ message: 'Visit logged successfully' });
-  }); 
+  });
 });
 
+// Add a review to a bakery
+router.post('/bakeries/:id/reviews', (req, res) => {
+  const { id } = req.params;
+  const { review, sentiment } = req.body;
+
+  const query = 'INSERT INTO reviews (bakery_id, review, sentiment) VALUES (?, ?, ?)';
+  connection.query(query, [id, review, sentiment], (error, results) => {
+    if (error) {
+      console.error('Error adding review:', error);
+      return res.status(500).json({ message: 'Failed to add review' });
+    }
+    res.status(201).json({ message: 'Review added successfully' });
+  });
+});
 
 module.exports = router;

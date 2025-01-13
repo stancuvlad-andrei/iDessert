@@ -34,14 +34,14 @@ function Dashboard() {
           setBakeries(data.bakeries);
           // Only set the selectedBakery if it hasn't been set yet
           if (data.bakeries.length > 0 && !selectedBakery) {
-            setSelectedBakery(data.bakeries[0]); // Select the first bakery by default
+            setSelectedBakery(data.bakeries[0]);
           }
         }
       })
       .catch((err) => {
         setError('Failed to fetch bakeries');
       });
-  }, [token, selectedBakery]); // Only re-run if token or selectedBakery changes
+  }, [token, selectedBakery]);
 
   // Function for adding a new bakery
   const handleAddBakery = () => {
@@ -60,7 +60,7 @@ function Dashboard() {
       .then(() => {
         setBakeries(bakeries.filter((bakery) => bakery.id !== bakeryId));
         if (selectedBakery?.id === bakeryId) {
-          setSelectedBakery(null); // Clear selected bakery if it was removed
+          setSelectedBakery(null);
         }
       })
       .catch((err) => {

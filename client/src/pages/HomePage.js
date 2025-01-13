@@ -1,21 +1,28 @@
-import React, { useEffect, useState, useContext } from 'react'; // Add useContext
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState, useContext } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { CartContext } from '../context/CartContext'; // Import CartContext
+import { CartContext } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 function HomePage() {
+  const { isAuthenticated } = useAuth();
+
+  // State and context hooks must be called unconditionally
   const [bakeries, setBakeries] = useState([]);
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { cart } = useContext(CartContext); // Use the global cart state
+  const { cart } = useContext(CartContext);
 
+  // Fetch data only if authenticated
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     // Fetch bakeries with good reviews for the carousel
     fetch(`/api/bakeries?reviews=good&search=${search}`)
       .then((res) => res.json())
@@ -39,7 +46,12 @@ function HomePage() {
         console.error('Error fetching random products:', error);
         setError('Failed to fetch random products.');
       });
-  }, [search]);
+  }, [search, isAuthenticated]);
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   if (loading) {
     return (
@@ -112,7 +124,7 @@ function HomePage() {
             pagination={{
               clickable: true,
             }}
-            navigation={false} // Disable navigation arrows
+            navigation={false}
             modules={[Autoplay, Pagination]}
             className="mySwiper"
           >

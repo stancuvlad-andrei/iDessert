@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useContext } from 'react'; // Add useContext
+import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { CartContext } from '../context/CartContext'; // Import CartContext
+import { CartContext } from '../context/CartContext';
 
 function AllBakeriesPage() {
   const [bakeries, setBakeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
-  const { cart } = useContext(CartContext); // Use the global cart state
+  const { cart } = useContext(CartContext);
 
   useEffect(() => {
     // Fetch all bakeries
-    fetch(`/api/bakeries?search=${search}`) // Include search query
+    fetch(`/api/bakeries?search=${search}`)
       .then((res) => res.json())
       .then((data) => {
         setBakeries(data.bakeries || []);
@@ -22,7 +22,7 @@ function AllBakeriesPage() {
         setError('Failed to fetch bakeries.');
         setLoading(false);
       });
-  }, [search]); // Re-fetch when search changes
+  }, [search]);
 
   if (loading) {
     return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Add useEffect
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function AddProduct() {
@@ -9,7 +9,7 @@ function AddProduct() {
     price: '',
     quantity: '',
   });
-  const [bakeries, setBakeries] = useState([]); // Add state for bakeries
+  const [bakeries, setBakeries] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 

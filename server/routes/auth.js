@@ -46,8 +46,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-
-// Login User
+// Login user
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -61,13 +60,14 @@ router.post('/login', (req, res) => {
     if (!isPasswordValid) return res.status(401).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ id: user.id, isOwner: user.role === 'owner' }, secretKey, { expiresIn: '1h' });
+    console.log('Generated token:', token);
     res.json({ token, isOwner: user.role === 'owner' });
   });
 });
 
 // Fetch User Details (for Account Page)
 router.get('/account', authenticateToken, (req, res) => {
-  const userId = req.user.id; // Extracted from the JWT token
+  const userId = req.user.id;
 
   const query = 'SELECT id, username, email, role FROM users WHERE id = ?';
   connection.query(query, [userId], (error, results) => {
@@ -79,7 +79,7 @@ router.get('/account', authenticateToken, (req, res) => {
     }
 
     const user = results[0];
-    res.json({ user });
+    res.json(user);
   });
 });
 

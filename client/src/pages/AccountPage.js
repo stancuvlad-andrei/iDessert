@@ -1,37 +1,42 @@
-import React, { useEffect, useState, useContext } from 'react'; // Add useContext
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { CartContext } from '../context/CartContext'; // Import CartContext
+import { CartContext } from '../context/CartContext';
 
 function AccountPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { cart } = useContext(CartContext); // Use the global cart state
+  const { cart } = useContext(CartContext);
 
   useEffect(() => {
-    // Fetch user details from the backend
     const token = localStorage.getItem('token');
     if (!token) {
-      navigate('/login'); // Redirect to login if no token
+      navigate('/login');
       return;
     }
-
+  
+    console.log('Token being sent:', token);
+  
     fetch('/api/account', {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.user) {
-          setUser(data.user);
-        } else {
-          alert('Failed to fetch user details');
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch user details');
         }
+        return res.json();
+      })
+      .then((data) => {
+        console.log('API Response:', data);
+        setUser(data);
         setLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching user details:', error);
+        setError('Failed to fetch user details. Please try again.');
         setLoading(false);
       });
   }, [navigate]);
@@ -89,7 +94,7 @@ function AccountPage() {
               <Link to="/cart" className="relative">
                 <span className="text-gray-700 hover:text-orange-600">Cart</span>
                 <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-2 py-1">
-                  {cart.length} {/* Dynamic cart count */}
+                  {cart.length}
                 </span>
               </Link>
             </div>
